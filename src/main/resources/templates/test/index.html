@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 必须的 meta 标签 -->
+    <meta charset="utf-8">
+    <!-- Bootstrap 的 CSS 文件 -->
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}">
+    <!-- Bootstrap 的 JS 文件 -->
+    <script th:src="@{/static/js/jquery-1.10.2.min.js}"></script>
+    <script th:src="@{/static/js/bootstrap.min.js}"></script>
+    <script th:src="@{/static/js/axios.min.js}"></script>
+    <title>mq连接工具</title>
+
+</head>
+<body>
+<form target="_blank" id="mqInfoForm" th:action="@{/createConsumer}" method="post">
+    ClientId:<input type="text" th:id="clientId" th:name="clientId" value="" readonly unselectable="on"/><br/>
+    ip:<input type="text" id="ip" th:name="ip"/><br/>
+    port(amqp):<input type="text" id="port" th:name="port"/><br/>
+    userName:<input type="text" id="userName" th:name="userName"/><br/>
+    password:<input type="text" id="password" th:name="password"/><br/>
+    queueName:<input type="text" id="queueName" th:name="queueName"/><br/>
+    <div id="activemqModel" hidden>
+        queueType:<input class="form-check-input" type="radio" th:name="queueType" id="flexRadioDefault1" checked
+                         value="queue"> queue
+        <input class="form-check-input" type="radio" th:name="queueType" id="flexRadioDefault2" value="topic"> topic
+    </div>
+    <br/>
+    <div id="rabbitmqModel" hidden>
+        routingKey:<input type="text" id="routingKey" th:name="routingKey"/><br/>
+        exchangeName:<input type="text" id="exchangeName" th:name="exchangeName"/><br/>
+        <!--        exchangeType:<input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType1" checked value="fanout" >  fanout-->
+        <!--        <input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType2" value="topic">  topic-->
+        <!--        <input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType3" value="direct">  direct-->
+        <!--        <input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType4" value="headers">  headers-->
+
+    </div>
+    <br/>
+    <select size="1" id="mqTypeEnum" th:name="mqTypeEnum" onchange="extraParam()">
+        <option value="0">-请选择业务类型-</option>
+        <option value="1">activemq</option>
+        <option value="2">rabbitmq</option>
+    </select>
+    <br/>
+    <input th:id="submit" type="button" value="send" onclick="createConsumer()"/>
+</form>
+<br/>
+<br/>
+<br/>
+<br/>
+
+
+
+<!--<form target="_blank" id="sendMessage" th:action="@{/sendMessage}" method="post">-->
+<form target="_blank" id="sendMessage" method="post">
+    ClientId:<input type="text" th:id="clientId1" th:name="clientId" value="" readonly unselectable="on"/><br/>
+    ip:<input type="text" id="ip1" th:name="ip"/><br/>
+    port(amqp):<input type="text" id="port1" th:name="port"/><br/>
+    userName:<input type="text" id="userName1" th:name="userName"/><br/>
+    password:<input type="text" id="password1" th:name="password"/><br/>
+    queueName:<input type="text" id="queueName1" th:name="queueName"/><br/>
+    <div id="activemqModel1" hidden>
+        queueType:<input class="form-check-input" type="radio" th:name="queueType" id="flexRadioDefault11" checked
+                         value="queue"> queue
+        <input class="form-check-input" type="radio" th:name="queueType" id="flexRadioDefault21" value="topic"> topic
+    </div>
+    <br/>
+    <div id="rabbitmqModel1" hidden>
+        routingKey:<input type="text" id="routingKey1" th:name="routingKey"/><br/>
+        exchangeName:<input type="text" id="exchangeName1" th:name="exchangeName"/><br/>
+        exchangeType:<input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType11" checked
+                            value="fanout"> fanout
+        <input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType21" value="topic"> topic
+        <input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType31" value="direct"> direct
+        <input class="form-check-input" type="radio" th:name="exchangeType" id="exchangeType41" value="headers"> headers
+    </div>
+    <br/>
+    <select size="1" id="mqTypeEnum1" th:name="mqTypeEnum" onchange="extraParam()">
+        <option value="0">-请选择业务类型-</option>
+        <option value="1">activemq</option>
+        <option value="2">rabbitmq</option>
+    </select>
+    <textarea class="form-control" rows="3" th:name="message"></textarea>
+    <input th:id="sended" type="button" value="send" onclick="createProducer()"/>
+</form>
+<hr/>
+<button onclick="closeWebSocket()">关闭WebSocket连接</button>
+<hr/>
+<div id="message"></div>
+</body>
+
+<script type="text/javascript">
+    var websocket = null;
+    //判断当前浏览器是否支持WebSocket
+    if ('WebSocket' in window) {
+        websocket = new WebSocket('ws://localhost:8080/websocket');
+    } else {
+        alert('当前浏览器 Not support websocket')
+    }
+
+    //连接发生错误的回调方法
+    websocket.onerror = function () {
+        setMessageInnerHTML("WebSocket连接发生错误");
+    };
+
+    //连接成功建立的回调方法
+    websocket.onopen = function () {
+        setMessageInnerHTML("WebSocket连接成功");
+    }
+
+    //接收到消息的回调方法
+    websocket.onmessage = function (event) {
+        //1.建立唯一标识后的动作
+        let data = event.data.toString()
+        if (0 === data.indexOf('您的唯一Socket标识为：')) {
+            let clientId = data.substring(data.indexOf('：') + 1, data.length)
+            document.getElementById('clientId').setAttribute('value', clientId);
+            document.getElementById('clientId1').setAttribute('value', clientId);
+        }
+        //2.mq连接成功之后要禁止此次会话再次创建任何mq连接
+        if (0 === data.indexOf('创建mq连接成功！！！')) {
+            document.getElementById("submit").disabled = true;
+        }
+
+        setMessageInnerHTML(event.data);
+    }
+
+    //连接关闭的回调方法
+    websocket.onclose = function () {
+        setMessageInnerHTML("WebSocket连接关闭");
+    }
+
+    //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    window.onbeforeunload = function () {
+        closeWebSocket();
+    }
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML) {
+        document.getElementById('message').innerHTML += innerHTML + '<br/>';
+    }
+
+    //关闭WebSocket连接
+    function closeWebSocket() {
+        websocket.close();
+    }
+
+    //请求发送函数
+    function createProducer() {
+        $('#sendMessage').on('submit', function (e) {
+            e.preventDefault()
+        })
+        axios({
+                method: 'POST',
+                url: '/sendMessage',
+                data: $("#sendMessage").serialize(),
+            }
+        ).then(function (resp) {
+            // alert(resp.data);
+        })
+    }
+    //请求发送函数
+    function createConsumer() {
+        $('#mqInfoForm').on('submit', function (e) {
+            e.preventDefault()
+        })
+        axios({
+                method: 'POST',
+                url: '/createConsumer',
+                data: $("#mqInfoForm").serialize(),
+            }
+        ).then(function (resp) {
+            setMessageInnerHTML(resp.data);
+        })
+    }
+    //rabbitmq所需要的额外参数展示
+    function extraParam() {
+        let businessType = $("#mqTypeEnum").val();
+        if (businessType == 1) {
+            document.getElementById('rabbitmqModel').setAttribute('hidden', 'hidden');
+            document.getElementById('activemqModel').removeAttribute('hidden');
+        } else if (businessType == 2) {
+            document.getElementById('rabbitmqModel').removeAttribute('hidden');
+            document.getElementById('activemqModel').setAttribute('hidden', 'hidden');
+        } else {
+            document.getElementById('activemqModel').setAttribute('hidden', 'hidden');
+            document.getElementById('rabbitmqModel').setAttribute('hidden', 'hidden');
+        }
+        let businessType1 = $("#mqTypeEnum1").val();
+        if (businessType1 == 1) {
+            document.getElementById('rabbitmqModel1').setAttribute('hidden', 'hidden');
+            document.getElementById('activemqModel1').removeAttribute('hidden');
+        } else if (businessType1 == 2) {
+            document.getElementById('rabbitmqModel1').removeAttribute('hidden');
+            document.getElementById('activemqModel1').setAttribute('hidden', 'hidden');
+        } else {
+            document.getElementById('activemqModel1').setAttribute('hidden', 'hidden');
+            document.getElementById('rabbitmqModel1').setAttribute('hidden', 'hidden');
+        }
+    }
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

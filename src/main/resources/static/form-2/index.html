@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>mq消息推送</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/form-elements.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Favicon and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+    <style>
+        .mydivStyle {
+            width: auto;
+            height: 450px;
+            overflow-y:auto;
+        }
+
+        .spanClass {
+            font-family: "楷体", "楷体_GB2312";
+            color: red;
+        }
+
+        .spanClass2 {
+            font-family: "楷体", "楷体_GB2312";
+            color: greenyellow;
+        }
+
+        .spanClass3 {
+            font-family: "楷体", "楷体_GB2312";
+            color: blue;
+        }
+
+        .spanClass5 {
+            font-family: "楷体", "楷体_GB2312";
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Content -->
+<div class="top-content">
+
+
+    <div class="container" style="float: right">
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2 text">
+                <a class="logo" href="index.html"></a>
+                <h1><strong>mq消息推送:</strong>创建一个mq的生产者</h1>
+
+            </div>
+        </div>
+        <br/>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">消息列表</h3>
+            </div>
+            <div id="message" class="mydivStyle">
+            </div>
+        </div>
+    </div>
+    <!-- MODAL -->
+    <div style="float: left" id="modal-register" tabindex="-1" role="dialog" aria-labelledby="modal-register-label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="modal-register-label">连接信息</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form role="form" id="mqInfoForm" action="" method="post" class="registration-form">
+                        <div class="form-group">
+                            <label class="sr-only" for="clientId">clientId</label>
+                            <input type="text" name="clientId" placeholder="clientId..."
+                                   class="form-first-name form-control" id="clientId" readonly unselectable="on">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="ip">ip</label>
+                            <input type="text" name="ip" placeholder="ip..." class="form-last-name form-control"
+                                   id="ip">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="port">port</label>
+                            <input type="text" name="port" placeholder="port..." class="form-email form-control"
+                                   id="port">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="userName">userName</label>
+                            <input type="text" name="userName" placeholder="userName..." class="form-email form-control"
+                                   id="userName">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="password">password</label>
+                            <input type="text" name="password" placeholder="password..." class="form-email form-control"
+                                   id="password">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="queueName">queueName</label>
+                            <input type="text" name="queueName" placeholder="queueName..."
+                                   class="form-email form-control"
+                                   id="queueName">
+                        </div>
+                        <div id="activemqModel" class="form-group" hidden>
+                            <select size="1" id="queueType" class="form-control" name="queueType">
+                                <option value="topic">-请选择队列类型-</option>
+                                <option value="queue">queue</option>
+                                <option value="topic">topic</option>
+                            </select>
+<!--                            <label class="sr-only" for="flexRadioDefault1">queueType</label>-->
+<!--                            queueType:<input type="radio" name="queueType" class="form-check-input"-->
+<!--                                             id="flexRadioDefault1" value="queue"> queue-->
+<!--                            <input type="radio" name="queueType" class="form-check-input" id="flexRadioDefault2" checked-->
+<!--                                   value="topic"> topic-->
+                        </div>
+                        <div id="rabbitmqModel" class="form-group" hidden>
+                            <label class="sr-only" for="routingKey">routingKey</label>
+                            <input type="text" id="routingKey" placeholder="routingKey..."
+                                   class="form-email form-control"
+                                   name="routingKey"/><br/>
+                            <label class="sr-only" for="exchangeName">exchangeName</label>
+                            <input type="text" id="exchangeName" placeholder="exchangeName..."
+                                   class="form-email form-control" name="exchangeName"/><br/>
+                            <select size="1" id="exchangeType" class="form-control" name="exchangeType">
+                                <option value="fanout">-请选择队列类型-</option>
+                                <option value="fanout">fanout</option>
+                                <option value="topic">topic</option>
+                                <option value="direct">direct</option>
+                                <option value="headers">headers</option>
+                            </select>
+                        </div>
+                        <br/>
+                        <select size="1" class="form-control" id="mqTypeEnum" name="mqTypeEnum" onchange="extraParam()">
+                            <option value="0">-请选择业务类型-</option>
+                            <option value="1">activemq</option>
+                            <option value="2">rabbitmq</option>
+                        </select>
+                        <br/>
+                        <div class="form-group">
+                            <label class="sr-only" for="form-about-yourself">消息内容</label>
+                            <textarea name="message" placeholder="send Message..."
+                                      class="form-about-yourself form-control" id="form-about-yourself"></textarea>
+                        </div>
+                        <button id="submit" type="submit" class="btn" onclick="createProducer()">Send</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Javascript -->
+<script src="assets/js/jquery-1.11.1.min.js"></script>
+<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="assets/js/jquery.backstretch.min.js"></script>
+<script src="assets/js/scripts.js"></script>
+<script src="assets/js/axios.min.js"></script>
+
+<!--[if lt IE 10]>
+<script src="assets/js/placeholder.js"></script>
+<![endif]-->
+
+</body>
+
+
+<script type="text/javascript">
+    var websocket = null;
+    //判断当前浏览器是否支持WebSocket
+    if ('WebSocket' in window) {
+         // websocket = new WebSocket('ws://10.19.220.37:1024/websocket');
+        // websocket = new WebSocket('ws://localhost:1024/websocket');
+        websocket = new WebSocket('ws://10.8.112.22:1024/websocket');
+    } else {
+        alert('当前浏览器 Not support websocket')
+    }
+
+    //连接发生错误的回调方法
+    websocket.onerror = function () {
+        setMessageInnerHTML("<p class='spanClass'>WebSocket连接发生错误</p>");
+    };
+
+    //连接成功建立的回调方法
+    websocket.onopen = function () {
+        setMessageInnerHTML("<p class='spanClass2'>WebSocket连接成功</p>");
+    }
+
+    //接收到消息的回调方法
+    websocket.onmessage = function (event) {
+        //1.建立唯一标识后的动作
+        let data = event.data.toString()
+        if (0 === data.indexOf('您的唯一Socket标识为：')) {
+            let clientId = data.substring(data.indexOf('：') + 1, data.length)
+            document.getElementById('clientId').setAttribute('value', clientId);
+        }
+        //2.mq连接成功之后要禁止此次会话再次创建任何mq连接
+        if (0 === data.indexOf('创建mq连接成功！！！')) {
+            document.getElementById("Launch modal").disabled = true;
+        }
+        setMessageInnerHTML(event.data);
+    }
+
+    //连接关闭的回调方法
+    websocket.onclose = function () {
+        setMessageInnerHTML("<p class='spanClass3'>WebSocket连接关闭</p>");
+    }
+
+    //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    window.onbeforeunload = function () {
+        closeWebSocket();
+    }
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML) {
+
+        document.getElementById('message').innerHTML += innerHTML + '<br/>';
+
+    }
+
+    //关闭WebSocket连接
+    function closeWebSocket() {
+        websocket.close();
+    }
+
+    //请求发送函数
+    function createProducer() {
+        $('#mqInfoForm').on('submit', function (e) {
+            e.preventDefault()
+        })
+        axios({
+                method: 'POST',
+                url: '/sendMessage',
+                data: $("#mqInfoForm").serialize(),
+            }
+        ).then(function (resp) {
+            // document.getElementById('close').click();
+            // document.getElementById('modal-register').setAttribute('class','modal fade');
+            // document.getElementById('modal-register').setAttribute('style','display: none;');
+            setMessageInnerHTML(resp.data);
+        })
+    }
+
+    //rabbitmq所需要的额外参数展示
+    function extraParam() {
+        let businessType = $("#mqTypeEnum").val();
+        if (businessType == 1) {
+            document.getElementById('rabbitmqModel').setAttribute('hidden', 'hidden');
+            document.getElementById('activemqModel').removeAttribute('hidden');
+        } else if (businessType == 2) {
+            document.getElementById('rabbitmqModel').removeAttribute('hidden');
+            document.getElementById('activemqModel').setAttribute('hidden', 'hidden');
+        } else {
+            document.getElementById('activemqModel').setAttribute('hidden', 'hidden');
+            document.getElementById('rabbitmqModel').setAttribute('hidden', 'hidden');
+        }
+    }
+</script>
+</html>

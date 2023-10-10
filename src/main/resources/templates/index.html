@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Bootstrap 的 CSS 文件 -->
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+	<!-- Bootstrap 的 JS 文件 -->
+	<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	<script th:src="@{/js/axios.min.js}"></script>
+	<title>mq连接工具</title>
+
+<!-- CSS -->
+<link rel="stylesheet" th:href="@{/css/Roboto.css}">
+<link rel="stylesheet" th:href="@{/form-1/assets/bootstrap/css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/choose-layout-assets/style.css}">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--&lt;!&ndash;[if lt IE 9]>-->
+<!--	<script th:src="@{/static/js/html5shiv.js}"></script>-->
+<!--	<script th:src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>-->
+<!--<![endif]&ndash;&gt;-->
+
+<!-- Favicon and touch icons -->
+<link rel="shortcut icon" th:href="@{/form-1/assets/ico/favicon.png}">
+
+</head>
+
+<body>
+
+<div class="top">
+	<h1>Mq连接工具</h1>
+	<p>
+		目前设计支持指定mq订阅消息/指定mq进行消息推送
+	</p>
+</div>
+
+<div class="section-container">
+	<div class="container layouts">
+		<div class="row">
+			<div class="col-sm-12 section-description">
+				<h3>选择连接方式</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-10 col-sm-offset-1">
+				<div class="row">
+					<div class="col-sm-6 layout-box">
+						<a th:target="_blank" th:href="@{/form-1/index.html}">
+							<img th:src="@{/choose-layout-assets/1.jpg}" alt="">
+						</a>
+						<p>功能1：订阅mq消息</p>
+					</div>
+					<div class="col-sm-6 layout-box">
+						<a th:target="_blank" th:href="@{/form-2/index.html}">
+							<img th:src="@{/choose-layout-assets/2.jpg}" alt="">
+						</a>
+						<p>功能2：指定mq推送消息</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container footer">
+	<div class="row">
+		<div class="col-sm-12">Copyright &copy; 2018.Company name All rights reserved.<a target="_blank" href="/saySomething">我有话说</a></div>
+	</div>
+</div>
+
+</body>
+
+</html>
